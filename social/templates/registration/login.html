@@ -1,0 +1,14 @@
+{% extends 'social/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h2>Login</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}  <!-- This will apply crispy forms styling -->
+    <p>Don't have an account? Create one <a href="/register">Here!</a></p>
+    <button type="submit" class="btn btn-success">Login</button>
+</form>
+{% endblock %}

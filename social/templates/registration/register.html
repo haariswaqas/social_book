@@ -1,0 +1,14 @@
+{% extends 'social/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<h2>Register</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}  <!-- Render the registration form with crispy styling -->
+    <p>Already have an account? Login <a href="/login">Here!</a></p>
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+{% endblock %}

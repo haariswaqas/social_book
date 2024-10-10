@@ -1,0 +1,51 @@
+{% extends 'social/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mt-5 mb-4 text-primary">
+        {% if post %}
+            Edit your Post
+        {% else %}
+            Make a Post
+        {% endif %}
+    </h2>
+    
+    <form method="POST" class="shadow-sm p-4 bg-white rounded">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group">
+                {{ field }}  <!-- Directly render the field with the class applied -->
+                {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="invalid-feedback d-block">
+                        {% for error in field.errors %}
+                            {{ error }}<br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">
+            {% if post %}
+                Save
+            {% else %}
+                Post
+            {% endif %}
+        </button>
+
+        {% if post %}
+            <div class="mt-4">
+                <div class="mb-2">
+                    <strong>Created:</strong> {{ post.created|date:"F j, Y, g:i a" }}<br>
+                    <strong>Last Updated:</strong> {{ post.updated|date:"F j, Y, g:i a" }}
+                </div>
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

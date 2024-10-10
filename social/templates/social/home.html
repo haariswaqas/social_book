@@ -1,0 +1,100 @@
+{% extends 'social/base.html' %}
+
+{% block title %} Homepage {% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4 text-primary">
+        {% if user.is_authenticated %}
+            Welcome, {{ user.username }}! 
+        {% else %}
+            Welcome to Our Social Platform
+        {% endif %}
+    </h1>
+
+    {% if user.is_staff %}
+        <p class="text-center mb-4 lead">As the Admin, you can manage posts and user interactions efficiently.</p>
+        <p class="text-center mb-4 lead">Use the navigation menu to access administrative tools.</p>
+    {% else %}
+        <p class="text-center mb-4 lead">
+            Connect with friends, share your thoughts, and explore a community of like-minded individuals.
+        </p>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow-sm border-light bg-info text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Engage</h5>
+                        <p class="card-text">
+                            Share your ideas and thoughts with others. Engage in meaningful conversations and discussions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow-sm border-light bg-success text-white">
+                    <div class="card-body">
+                        <h5 class="card-title">Discover</h5>
+                        <p class="card-text">
+                            Discover new perspectives and insights from users around the world. Explore diverse topics and interests.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card shadow-sm border-light bg-warning text-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Create</h5>
+                        <p class="card-text">
+                            Create posts; your voice matters in our community.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="text-center mt-5 mb-4 text-success">Why Join Us?</h2>
+        <p class="text-center lead">
+            Our platform is dedicated to building a friendly and inclusive environment where everyone can share their voice.
+            Join us today and be part of an amazing community!
+        </p>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        <h2 class="text-center mt-5 mb-4 text-primary">Recent Posts</h2>
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card shadow-sm border-light">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">@{{ post.author.username }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">on {{ post.created|date:"F j, Y, g:i a" }}</h6>
+                        <p class="card-text">{{ post.description|truncatewords:20 }}</p>
+
+                        {% if user == post.author %}
+                            <form method="POST" action="{% url 'post_list' %}" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="post-id" value="{{ post.id }}">
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                            <a href="{% url 'edit_post' post.id %}" class="btn btn-primary btn-sm">Edit</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    No posts available.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <h2 class="text-center mt-5 mb-4">Recent Posts</h2>
+        <div class="text-center">
+            <p class="lead">You must be logged in to see recent posts.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

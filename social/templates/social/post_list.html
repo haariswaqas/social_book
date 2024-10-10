@@ -1,0 +1,69 @@
+{% extends 'social/base.html' %}
+
+{% block title %} Posts {% endblock %}
+
+{% block content %}
+<h1 class="my-4 text-center text-primary">Posts</h1>
+
+{% if messages %}
+  <ul class="list-group mb-4">
+    {% for message in messages %}
+      <li class="list-group-item {% if message.tags == 'success' %}alert alert-success{% else %}alert alert-danger{% endif %}">
+        {{ message }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<div class="container">
+  {% for post in posts %}
+    <div class="card shadow-sm border-light mb-4">
+      <div class="card-body">
+        <h5 class="card-title text-primary">@{{ post.author.username }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+          on {{ post.created|date:"F j, Y, g:i a" }}
+        </h6>
+        <p class="card-text">{{ post.description|truncatewords:20 }}</p>
+
+        {% if user == post.author or is_mod %}
+          <form method="POST" action="{% url 'post_list' %}" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="post-id" value="{{ post.id }}">
+            <input type="hidden" name="action" value="delete">
+            <button type="submit" class="btn btn-danger btn-sm me-1">Delete</button>
+          </form>
+
+          {% if user == post.author %}
+          <a href="{% url 'edit_post' post.id %}" class="btn btn-primary btn-sm">Edit</a>
+          {% endif %}
+        {% endif %}
+
+        {% if user.is_staff %}
+          {% if post.author.id not in banned_user_ids %}
+            <!-- Unban Form -->
+            <form method="POST" action="{% url 'post_list' %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="user-id" value="{{ post.author.id }}">
+              <input type="hidden" name="action" value="unban">
+              <button type="submit" class="btn btn-success btn-sm">Unban</button>
+            </form>
+          {% else %}
+            <!-- Ban Form -->
+            <form method="POST" action="{% url 'post_list' %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="user-id" value="{{ post.author.id }}">
+              <input type="hidden" name="action" value="ban">
+              <button type="submit" class="btn btn-warning btn-sm">Ban</button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  {% empty %}
+    <div class="alert alert-info text-center" role="alert">
+      No posts available.
+    </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
